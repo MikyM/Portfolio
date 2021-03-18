@@ -13,6 +13,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Server.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
+using NLog;
+using System.IO;
 
 namespace Server
 {
@@ -20,6 +22,7 @@ namespace Server
     {
         public Startup(IConfiguration configuration)
         {
+            LogManager.LoadConfiguration(String.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
             Configuration = configuration;
         }
 
@@ -30,6 +33,7 @@ namespace Server
         {
             services.ConfigureCors();
             services.ConfigureIISIntegration();
+            services.ConfigureLoggerService();
             services.AddControllers();
             services.AddSwaggerGen(c => {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Server", Version = "v1" });
