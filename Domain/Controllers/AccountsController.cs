@@ -10,8 +10,9 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Entities.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Domain.Helpers;
+using System.Security.Claims;
+using AuthService.Helpers;
 
 namespace Domain.Controllers
 {
@@ -19,21 +20,24 @@ namespace Domain.Controllers
     [Route("api/[controller]")]
     public class AccountsController : ControllerBase
     {
-        private ILoggerManager _logger;
-        private IRepositoryWrapper _repository;
-        private IMapper _mapper;
-        private UserManager<AppUser> _userManager;
-        public AccountsController(ILoggerManager logger, IRepositoryWrapper repository, IMapper mapper, UserManager<AppUser> userManager)
+        private readonly ILoggerManager _logger;
+        private readonly IRepositoryWrapper _repository;
+        private readonly IMapper _mapper;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public AccountsController(ILoggerManager logger, IRepositoryWrapper repository, IMapper mapper, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _logger = logger;
             _repository = repository;
             _mapper = mapper;
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
+        [AllowAnonymous]
         // POST api/accounts
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] AppUserForCreationDto user)
+        [HttpPost("user/create")]
+        public async Task<IActionResult> CreateUser([FromBody] AppUserForCreationDto user)
         {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
@@ -48,6 +52,73 @@ namespace Domain.Controllers
             //await _appDbContext.SaveChangesAsync();
 
             return Ok();
+        }
+
+        [AllowAnonymous]
+        [HttpPut("user/update-information")]
+        public async Task<IActionResult> UpdateUserInfo(Guid id, [FromBody] AppUserForUpdateDto user)
+        {
+            if (!ModelState.IsValid) {
+                return BadRequest(ModelState);
+            }
+
+      
+            var userIdentity = await _userManager.FindByIdAsync(id.ToString());
+            _mapper.Map(user, userIdentity);
+            userIdentity.Email = user.Email;
+            userIdentity.UserName = user.UserName;
+            userIdentity.FirstName = user.FirstName;
+            userIdentity.LastName = user.LastName;
+            var result = await _userManager.UpdateAsync(userIdentity);
+
+            if (!result.Succeeded) return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
+
+            //await _appDbContext.JobSeekers.AddAsync(new JobSeeker { IdentityId = userIdentity.Id, Location = model.Location });
+            //await _appDbContext.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [AllowAnonymous]
+        [HttpPut("user/password-reset")]
+        public async Task<IActionResult> UpdateUserPw(Guid id, string password)
+        {
+            if (!ModelState.IsValid) {
+                return BadRequest(ModelState);
+            }
+
+            var userIdentity = await _userManager.FindByIdAsync(id.ToString());
+            var token = await _userManager.GeneratePasswordResetTokenAsync(userIdentity);
+            var result = await _userManager.ResetPasswordAsync(userIdentity, token, password);
+
+            if (!result.Succeeded) return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
+
+            //await _appDbContext.JobSeekers.AddAsync(new JobSeeker { IdentityId = userIdentity.Id, Location = model.Location });
+            //await _appDbContext.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [Authorize(Policy = "Admin")]
+        [HttpPut("user/create-admin")]
+        public async Task<IActionResult> CreateAdminRole(Guid id)
+        {
+            if (!ModelState.IsValid) {
+                return BadRequest(ModelState);
+            }
+
+            var userIdentity = await _userManager.FindByIdAsync(id.ToString());
+            if (userIdentity is null) return NotFound(id);
+            var userClaims = await _userManager.GetClaimsAsync(userIdentity);
+            if (userClaims.Any(x => x.Value.Equals("admin"))) return Ok(new { message = "User is admin already" });
+
+            var result = await _userManager.AddClaimAsync(userIdentity, new Claim(Constants.Strings.JwtClaimIdentifiers.IsAdmin, Constants.Strings.JwtClaims.Admin));
+
+            if (!result.Succeeded) return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
+            //await _appDbContext.JobSeekers.AddAsync(new JobSeeker { IdentityId = userIdentity.Id, Location = model.Location });
+            //await _appDbContext.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

@@ -15,7 +15,9 @@ namespace Server
             CreateMap<Skill, SkillDto>();
             CreateMap<SkillForCreationDto, Skill>();
             CreateMap<SkillForUpdateDto, Skill>();
+            CreateMap<AppUserDto, AppUser>();
             CreateMap<AppUserForCreationDto, AppUser>().ForMember(au => au.UserName, map => map.MapFrom(vm => vm.Email));
+            CreateMap<AppUserForUpdateDto, AppUser>().ForMember(au => au.UserName, map => map.MapFrom(vm => vm.Email));
         }
     }
 }

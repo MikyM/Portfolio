@@ -73,7 +73,7 @@ namespace Server.Extensions
 
             services.AddAuthorization(options => {
                 options.AddPolicy("ApiUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Rol, Constants.Strings.JwtClaims.ApiAccess));
-                options.AddPolicy("Admin", policy => policy.RequireClaim(Constants.Strings.JwtClaims.Admin));
+                options.AddPolicy("Admin", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.IsAdmin, Constants.Strings.JwtClaims.Admin));
             });
 
             services.AddIdentity<AppUser, IdentityRole>
@@ -93,7 +93,9 @@ namespace Server.Extensions
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
                 .AddJwtBearer(options => {
+                    options.ClaimsIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
                     options.TokenValidationParameters = tokenValidationParameters;
+                    options.SaveToken = true;
                 });
 
         }
@@ -103,8 +105,7 @@ namespace Server.Extensions
             var jwtAppSettingOptions = config.GetSection(nameof(JwtIssuerOptions));
 
             // Configure JwtIssuerOptions
-            services.Configure<JwtIssuerOptions>(options =>
-            {
+            services.Configure<JwtIssuerOptions>(options => {
                 options.Issuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
                 options.Audience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)];
                 options.SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

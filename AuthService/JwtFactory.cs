@@ -34,7 +34,7 @@ namespace AuthService
                  identity.FindFirst(Constants.Strings.JwtClaimIdentifiers.Id)
             };
 
-            claims.AddRange(identity.Claims.Where(c => c.Type == Constants.Strings.JwtClaimIdentifiers.Roles));
+            claims.AddRange(identity.Claims.Where(c => c.Type == Constants.Strings.JwtClaimIdentifiers.IsAdmin));
 
             // Create the JWT security token and encode it.
             var jwt = new JwtSecurityToken(
@@ -72,11 +72,11 @@ namespace AuthService
         {
             var claims = new ClaimsIdentity(new GenericIdentity(userName, "Token"), new[] {
                 new Claim(Constants.Strings.JwtClaimIdentifiers.Id, id),
-                new Claim(Constants.Strings.JwtClaimIdentifiers.Rol, Helpers.Constants.Strings.JwtClaims.ApiAccess)
+                new Claim(Constants.Strings.JwtClaimIdentifiers.Rol, Constants.Strings.JwtClaims.ApiAccess)
             });
 
             foreach (var role in roles) {
-                claims.AddClaim(new Claim(Constants.Strings.JwtClaimIdentifiers.Roles, role));
+                claims.AddClaim(new Claim(Constants.Strings.JwtClaimIdentifiers.IsAdmin, role));
             }
 
             return claims;

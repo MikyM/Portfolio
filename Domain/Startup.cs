@@ -19,6 +19,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using AuthService.Interfaces;
 using AuthService;
+using System.Collections.Generic;
 
 namespace Server
 {
@@ -59,6 +60,20 @@ namespace Server
             });
             services.AddSwaggerGen(c => {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Server", Version = "v1" });
+                c.AddSecurityDefinition("bearer", new OpenApiSecurityScheme {
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Scheme = "bearer"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement(){{ new OpenApiSecurityScheme {
+                     Reference = new OpenApiReference {
+                          Type = ReferenceType.SecurityScheme,
+                          Id = "bearer"
+                     },
+                }, new List<string>()}
+                });
             });
         }
 

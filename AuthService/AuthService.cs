@@ -38,7 +38,7 @@ namespace AuthService
         {
             var identity = await GetClaimsIdentity(credentials.UserName, credentials.Password);
             if (identity == null) {
-                return null;//BadRequest(Errors.AddErrorToModelState("login_failure", "Invalid username or password.", ModelState));
+                return null;
             }
 
             // Serialize and return the response
@@ -50,7 +50,7 @@ namespace AuthService
                 id = identity.Claims.Single(c => c.Type == "id").Value,
                 authToken = await _jwtFactory.GenerateEncodedToken(credentials.UserName, identity),
                 expiresIn = (int)_jwtOptions.ValidFor.TotalSeconds,
-                refreshToken = refreshToken
+                refreshToken = refreshToken.Token
             };
             var json = JsonSerializer.Serialize(response, _serializerSettings);
 
@@ -78,7 +78,8 @@ namespace AuthService
             await _userManager.UpdateAsync(user);
 
             // generate new jwt
-            List<string> userRoles = await _userManager.GetRolesAsync(user) as List<string>;
+            var claims = await _userManager.GetClaimsAsync(user);
+            var userRoles = claims.Select(x => x.Value).ToList();
             var identity = _jwtFactory.GenerateClaimsIdentity(user.UserName, user.Id, userRoles);
             var jwtToken = _jwtFactory.GenerateEncodedToken(user.UserName, identity).Result;
 
@@ -125,8 +126,8 @@ namespace AuthService
                 if (userToVerify != null) {
                     // check the credentials  
                     if (await _userManager.CheckPasswordAsync(userToVerify, password)) {
-                        List<string> userRoles = await _userManager.GetRolesAsync(userToVerify) as List<string>;
-                        return await Task.FromResult(_jwtFactory.GenerateClaimsIdentity(userName, userToVerify.Id, userRoles));
+                        var claims = await _userManager.GetClaimsAsync(userToVerify);
+                        return await Task.FromResult(_jwtFactory.GenerateClaimsIdentity(userName, userToVerify.Id, claims.Select(x => x.Value).ToList()));
                     }
                 }
             }

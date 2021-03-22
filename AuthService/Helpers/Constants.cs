@@ -11,13 +11,13 @@ namespace AuthService.Helpers
         {
             public static class JwtClaimIdentifiers
             {
-                public const string Rol = "rol", Id = "id", Roles = "roles";
+                public const string Rol = "rol", Id = "id", IsAdmin = "isAdmin";
             }
 
             public static class JwtClaims
             {
                 public const string ApiAccess = "api_access";
-                public const string Admin = "admin_access";
+                public const string Admin = "true";
             }
         }
     }

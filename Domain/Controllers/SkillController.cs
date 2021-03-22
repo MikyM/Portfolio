@@ -65,7 +65,7 @@ namespace Server.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateSkill(Guid id,[FromBody] SkillForUpdateDto skill)
+        public async Task<IActionResult> UpdateSkill(Guid id, [FromBody] SkillForUpdateDto skill)
         {
             if (!Enum.IsDefined(typeof(SkillType), skill.Type)) {
                 return BadRequest();
