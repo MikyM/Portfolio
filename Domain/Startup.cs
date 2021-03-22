@@ -61,17 +61,32 @@ namespace Server
             services.AddSwaggerGen(c => {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Server", Version = "v1" });
                 c.AddSecurityDefinition("bearer", new OpenApiSecurityScheme {
+                    Description = "Authorization by JWT",
                     Type = SecuritySchemeType.Http,
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
                     Scheme = "bearer"
                 });
-
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement(){{ new OpenApiSecurityScheme {
                      Reference = new OpenApiReference {
                           Type = ReferenceType.SecurityScheme,
                           Id = "bearer"
                      },
+                }, new List<string>()}
+                });
+                c.AddSecurityDefinition("apikey", new OpenApiSecurityScheme {
+                    Description = "Authorization by api key inside request's header",
+                    Type = SecuritySchemeType.ApiKey,
+                    Name = "ApiKey",
+                    In = ParameterLocation.Header,
+                    Scheme = "ApiKeyScheme"
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement {{ new OpenApiSecurityScheme {
+                    Reference = new OpenApiReference {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "apikey"
+                    },
+                    In = ParameterLocation.Header
                 }, new List<string>()}
                 });
             });

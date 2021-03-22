@@ -17,10 +17,11 @@ using AuthService;
 using AuthService.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using AuthService.Models;
+using SecuringWebApiUsingApiKey.Attributes;
 
 namespace Domain.Controllers
 {
-    [Authorize]
+    [ApiKey]
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
@@ -32,7 +33,6 @@ namespace Domain.Controllers
             _authService = authService;
         }
 
-        [AllowAnonymous]
         [HttpPost("authenticate")]
         public async Task<IActionResult> Authenticate([FromBody] AuthenticateRequest model)
         {
