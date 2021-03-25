@@ -1,4 +1,5 @@
 ﻿using Entities.Models;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,12 +8,14 @@ using System.Threading.Tasks;
 
 namespace Contracts
 {
-    public interface IUserRepository : IRepositoryBase<AppUser>
+    public interface IUserRepository
     {
-        Task<IEnumerable<AppUser>> GetAllUsersAsync();
-        Task<AppUser> GetUserByIdAsync(Guid userId);
-        void UpdateUser(AppUser user);
-        void DeleteUser(AppUser user);
-        void CreateUser(AppUser user);
+        IQueryable<AppUser> GetAll();
+        AppUser GetByEmail(string email);
+        AppUser GetById(Guid id);
+        Task<IdentityResult> Create(AppUser user, string password);
+        Task<IdentityResult> Delete(AppUser user);
+        Task<IdentityResult> Update(AppUser user);
+        UserManager<AppUser> GetUserManager();
     }
 }

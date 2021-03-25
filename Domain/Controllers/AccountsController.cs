@@ -16,22 +16,18 @@ using AuthService.Helpers;
 
 namespace Domain.Controllers
 {
-    [ApiController]
+    /*[ApiController]
     [Route("api/[controller]")]
     public class AccountsController : ControllerBase
     {
         private readonly ILoggerManager _logger;
         private readonly IRepositoryWrapper _repository;
         private readonly IMapper _mapper;
-        private readonly UserManager<AppUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-        public AccountsController(ILoggerManager logger, IRepositoryWrapper repository, IMapper mapper, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
+        public AccountsController(ILoggerManager logger, IRepositoryWrapper repository, IMapper mapper)
         {
             _logger = logger;
             _repository = repository;
             _mapper = mapper;
-            _userManager = userManager;
-            _roleManager = roleManager;
         }
 
         [AllowAnonymous]
@@ -120,5 +116,5 @@ namespace Domain.Controllers
 
             return NoContent();
         }
-    }
+    }*/
 }

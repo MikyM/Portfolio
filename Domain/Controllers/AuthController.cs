@@ -17,7 +17,6 @@ using AuthService;
 using AuthService.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using AuthService.Models;
-using SecuringWebApiUsingApiKey.Attributes;
 
 namespace Domain.Controllers
 {

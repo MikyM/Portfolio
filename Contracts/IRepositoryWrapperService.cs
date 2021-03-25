@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace Contracts
 {
-    public interface IRepositoryWrapper
+    public interface IRepositoryWrapperService
     {
-        ISkillRepository Skills { get; }
-        IRefreshTokenRepository RefreshTokens { get; }
-        IUserRepository Users { get; }
+        ISkillService Skills { get; }
         Task SaveAsync();
     }
 }*/

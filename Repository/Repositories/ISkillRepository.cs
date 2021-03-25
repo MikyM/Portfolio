@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Contracts
+namespace Repository.Repositories
 {
-    public interface ISkillRepository : IRepositoryBase<Skill>
+    public interface ISkillRepository : IBaseRepository<Skill>
     {
         Task<IEnumerable<Skill>> GetAllSkillsAsync();
         Task<Skill> GetSkillByIdAsync(Guid skillId);

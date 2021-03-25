@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Contracts
 {
-    public interface IRefreshTokenRepository : IRepositoryBase<RefreshToken>
+    public interface IRefreshTokenRepository //: IBaseRepository<RefreshToken>
     {
         Task<IEnumerable<RefreshToken>> GetAllTokensAsync();
         Task<RefreshToken> GetTokenByIdAsync(Guid tokenId);

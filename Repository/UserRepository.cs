@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using Entities;
 using Entities.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,35 +10,38 @@ using System.Threading.Tasks;
 
 namespace Repository
 {
-    public class UserRepository : RepositoryBase<AppUser>, IUserRepository
+    public class UserRepository : IUserRepository
     {
-        public UserRepository(RepositoryContext repositoryContext)
-            : base(repositoryContext)
+        private readonly UserManager<AppUser> _userManager;
+
+        public UserRepository(UserManager<AppUser> userManager)
         {
+            _userManager = userManager;
         }
 
-        public async Task<IEnumerable<AppUser>> GetAllUsersAsync()
+        public IQueryable<AppUser> GetAll() => _userManager.Users;
+
+        public AppUser GetByEmail(string email) => _userManager.Users.First(u => u.Email == email);
+        public AppUser GetById(Guid id) => _userManager.Users.First(u => u.Id == id.ToString());
+
+        public Task<IdentityResult> Create(AppUser user, string password)
         {
-            return await FindAll()
-               .OrderBy(x => x.UserName)
-               .ToListAsync();
+            return _userManager.CreateAsync(user, password);
         }
-        public async Task<AppUser> GetUserByIdAsync(Guid userId)
+
+        public async Task<IdentityResult> Delete(AppUser user)
         {
-            return await FindByCondition(user => user.Id.Equals(userId))
-                .FirstOrDefaultAsync();
+            return await _userManager.DeleteAsync(user);
         }
-        public void CreateUser(AppUser user)
+
+        public async Task<IdentityResult> Update(AppUser user)
         {
-            Create(user);
+            return await _userManager.UpdateAsync(user);
         }
-        public void UpdateUser(AppUser user)
+
+        public UserManager<AppUser> GetUserManager()
         {
-            Update(user);
-        }
-        public void DeleteUser(AppUser user)
-        {
-            Delete(user);
+            return _userManager;
         }
     }
 }

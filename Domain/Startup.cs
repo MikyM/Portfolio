@@ -1,10 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
 using System;
 using Server.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -16,10 +13,8 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Domain;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using AuthService.Interfaces;
 using AuthService;
-using System.Collections.Generic;
+using Repository.ErrorHandler;
 
 namespace Server
 {
@@ -44,52 +39,19 @@ namespace Server
             // configure jwt authentication
             var appSettings = appSettingsSection.Get<AppSettings>();
             SymmetricSecurityKey _signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(appSettings.Secret));
-
-            services.AddSingleton<IJwtFactory, JwtFactory>();
-            services.AddScoped<IAuthService, AuthService.AuthService>();
+            services.ConfigureErrorHandler();
             services.ConfigureCors();
             services.ConfigureIISIntegration();
             services.ConfigureLoggerService();
             services.ConfigureMySqlContext(Configuration);
-            services.ConfigureRepositoryWrapper();
+            services.ConfigureRepositories();
             services.AddAutoMapper(typeof(Startup));
             services.ConfigureJtwIssuerOptions(Configuration, _signingKey);
-            services.ConfigureAuthentication(Configuration, _signingKey);
+            services.ConfigureAuth(Configuration, _signingKey);
             services.AddControllers(options =>{
                 options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
             });
-            services.AddSwaggerGen(c => {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Server", Version = "v1" });
-                c.AddSecurityDefinition("bearer", new OpenApiSecurityScheme {
-                    Description = "Authorization by JWT",
-                    Type = SecuritySchemeType.Http,
-                    BearerFormat = "JWT",
-                    In = ParameterLocation.Header,
-                    Scheme = "bearer"
-                });
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement(){{ new OpenApiSecurityScheme {
-                     Reference = new OpenApiReference {
-                          Type = ReferenceType.SecurityScheme,
-                          Id = "bearer"
-                     },
-                }, new List<string>()}
-                });
-                c.AddSecurityDefinition("apikey", new OpenApiSecurityScheme {
-                    Description = "Authorization by api key inside request's header",
-                    Type = SecuritySchemeType.ApiKey,
-                    Name = "ApiKey",
-                    In = ParameterLocation.Header,
-                    Scheme = "ApiKeyScheme"
-                });
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement {{ new OpenApiSecurityScheme {
-                    Reference = new OpenApiReference {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "apikey"
-                    },
-                    In = ParameterLocation.Header
-                }, new List<string>()}
-                });
-            });
+            services.ConfigureSwagger();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

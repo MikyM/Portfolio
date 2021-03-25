@@ -1,17 +1,11 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Entities.Models
 {
     [Owned]
-    public class RefreshToken
+    public class RefreshToken : BaseEntity
     {
-        [Key]
-        [JsonIgnore]
-        public Guid Id { get; set; }
-
         public string Token { get; set; }
         public DateTime Expires { get; set; }
         public bool IsExpired => DateTime.UtcNow >= Expires;

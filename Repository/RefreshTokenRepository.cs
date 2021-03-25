@@ -2,6 +2,7 @@
 using Entities;
 using Entities.Models;
 using Microsoft.EntityFrameworkCore;
+using Repository.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,23 +10,22 @@ using System.Threading.Tasks;
 
 namespace Repository
 {
-    public class RefreshTokenRepository : RepositoryBase<RefreshToken>, IRefreshTokenRepository
+    public class RefreshTokenRepository : BaseRepository<RefreshToken>, IRefreshTokenRepository
     { 
-        public RefreshTokenRepository(RepositoryContext repositoryContext)
-            : base(repositoryContext)
+        public RefreshTokenRepository(RepositoryContext repositoryContext, IErrorHandler errorHandler)
+            : base(repositoryContext, errorHandler)
         {
         }
 
         public async Task<IEnumerable<RefreshToken>> GetAllTokensAsync()
         {
-            return await FindAll()
+            return await GetAll()
                .OrderBy(x => x.Id)
                .ToListAsync();
         }
         public async Task<RefreshToken> GetTokenByIdAsync(Guid tokenId)
         {
-            return await FindByCondition(token => token.Id.Equals(tokenId))
-                .FirstOrDefaultAsync();
+            return await GetTokenByIdAsync(tokenId);
         }
         public void CreateToken(RefreshToken token)
         {

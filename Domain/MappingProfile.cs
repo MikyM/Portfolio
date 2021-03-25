@@ -13,6 +13,7 @@ namespace Server
         public MappingProfile()
         {
             CreateMap<Skill, SkillDto>();
+            CreateMap<SkillDto, Skill>();
             CreateMap<SkillForCreationDto, Skill>();
             CreateMap<SkillForUpdateDto, Skill>();
             CreateMap<AppUserDto, AppUser>();
