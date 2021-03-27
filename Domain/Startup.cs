@@ -45,6 +45,7 @@ namespace Server
             services.ConfigureLoggerService();
             services.ConfigureMySqlContext(Configuration);
             services.ConfigureRepositories();
+            services.ConfigureUriService();
             services.AddAutoMapper(typeof(Startup));
             services.ConfigureJtwIssuerOptions(Configuration, _signingKey);
             services.ConfigureAuth(Configuration, _signingKey);

@@ -33,6 +33,10 @@ namespace Repository.Repositories
             return await GetByCondition(skill => skill.Id.Equals(skillId))
                 .FirstOrDefaultAsync();
         }
+        public async Task<int> CountSkillsAsync()
+        {
+            return await CountAsync();
+        }
         public void CreateSkill(Skill Skill)
         {
             Create(Skill);

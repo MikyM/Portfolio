@@ -1,15 +1,12 @@
-﻿using Contracts;
-using Entities;
-using Entities.Models;
+﻿using Entities.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Repository.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace Repository
+namespace Repository.Repositories
 {
     public class UserRepository : IUserRepository
     {
@@ -23,7 +20,6 @@ namespace Repository
         public IQueryable<AppUser> Get() => _userManager.Users;
 
         public AppUser GetByEmail(string email) => _userManager.Users.First(u => u.Email == email);
-        public AppUser GetById(Guid id) => _userManager.Users.First(u => u.Id == id.ToString());
 
         public Task<IdentityResult> Create(AppUser user, string password)
         {

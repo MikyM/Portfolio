@@ -13,13 +13,14 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using AuthService;
 using AuthService.Helpers;
-using Repository.Services;
+using Domain.Services;
 using Repository.Repositories;
 using Repository.UnitOfWork;
 using AuthService.Interfaces;
 using Microsoft.OpenApi.Models;
 using System.Collections.Generic;
 using Repository.ErrorHandler;
+using Microsoft.AspNetCore.Http;
 
 namespace Server.Extensions
 {
@@ -59,6 +60,8 @@ namespace Server.Extensions
         {
             services.AddTransient(typeof(IBaseRepository<>), typeof(BaseRepository<>));
             services.AddTransient(typeof(IBaseService<>), typeof(BaseService<>));
+            services.AddTransient<IUserRepository, Repository.Repositories.UserRepository>();
+            services.AddTransient<IUserService, UserService>();
             services.AddTransient<ISkillService, SkillService>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
         }
@@ -163,6 +166,17 @@ namespace Server.Extensions
         public static void ConfigureErrorHandler(this IServiceCollection services)
         {
             services.AddTransient<IErrorHandler, ErrorHandler>();
+        }
+
+        public static void ConfigureUriService(this IServiceCollection services)
+        {
+            services.AddSingleton<IUriService>(o =>
+            {
+                var accessor = o.GetRequiredService<IHttpContextAccessor>();
+                var request = accessor.HttpContext.Request;
+                var uri = string.Concat(request.Scheme, "://", request.Host.ToUriComponent());
+                return new UriService(uri);
+            });
         }
     }
 }

@@ -13,6 +13,7 @@ namespace Repository.Repositories
         IQueryable<TEntity> GetAll();
         Task<TEntity> GetById(Guid id);
         IQueryable<TEntity> GetByCondition(Expression<Func<TEntity, bool>> expression);
+        Task<int> CountAsync();
         void Create(TEntity entity);
         void Update(TEntity entity);
         void Delete(TEntity entity);

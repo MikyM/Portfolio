@@ -2,10 +2,14 @@
 using System;
 using System.Threading.Tasks;
 using Entities.DataTransferObjects;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Entities.Models;
-using Repository.Services;
+using Entities.Wrappers;
+using Entities.Filters;
+using System.Linq;
+using System.Collections.Generic;
+using Domain.Services;
+using Domain.Helpers;
 
 namespace Server.Controllers
 {
@@ -14,23 +18,28 @@ namespace Server.Controllers
     public class SkillController : ControllerBase
     {
         private ISkillService _skillService;
-        public SkillController(ISkillService skillService)
+        private IUriService _uriService;
+        public SkillController(ISkillService skillService, IUriService uriService)
         {
             _skillService = skillService;
+            _uriService = uriService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllSkills()
+        public async Task<IActionResult> GetAllSkills([FromQuery] PaginationFilter filter)
         {
-            var skillsResult = await _skillService.GetAsync();
-            return Ok(skillsResult);
+            var route = Request.Path.Value;
+            var validFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
+            var skillsResult = await _skillService.GetAll(validFilter);
+            var pagedReponse = PaginationHelper.CreatePagedReponse(skillsResult.Skills.ToList(), validFilter, skillsResult.TotalRecords, _uriService, route);
+            return Ok(pagedReponse);
         }
 
         [HttpGet("{id:guid}", Name = "SkillById")]
         public async Task<IActionResult> GetSkillById(Guid id)
         {
             var skillResult = await _skillService.GetById(id);
-            return Ok(skillResult);
+            return Ok(new Response<SkillDto>(skillResult));
         }
 
         [HttpGet("{type:int}", Name = "SkillsByType")]

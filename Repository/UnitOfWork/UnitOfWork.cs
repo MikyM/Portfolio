@@ -1,5 +1,7 @@
 ﻿using Contracts;
 using Entities;
+using Entities.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Repository.Repositories;
@@ -10,9 +12,9 @@ namespace Repository.UnitOfWork
     public class UnitOfWork : IUnitOfWork
     {
 
-        private RepositoryContext _dbContext;
+        private readonly RepositoryContext _dbContext;
         private ISkillRepository _skills;
-        private IErrorHandler _errorHandler;
+        private readonly IErrorHandler _errorHandler;
 
         public UnitOfWork(RepositoryContext dbContext, IErrorHandler errorHandler)
         {

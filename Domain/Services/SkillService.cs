@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Entities.DataTransferObjects;
+using Entities.Filters;
 using Entities.Models;
 using Repository.UnitOfWork;
 using System;
@@ -9,7 +10,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repository.Services
+namespace Domain.Services
 {
     public class SkillService : ISkillService
     {
@@ -25,10 +26,11 @@ namespace Repository.Services
             _unitOfWok = unitOfWork;
         }
 
-        public async Task<IEnumerable<SkillDto>> GetAsync()
+        public async Task<(IEnumerable<SkillDto> Skills, int TotalRecords)> GetAll(PaginationFilter filter)
         {
-            var result = await _service.GetAsync();
-            return result.Select(t => _mapper.Map<Skill, SkillDto>(t));
+            var result = await _service.GetAll(filter);
+            var totalRecords = await _unitOfWok.Skills.CountAsync();
+            return (result.Select(t => _mapper.Map<Skill, SkillDto>(t)), totalRecords);
         }
 
         public async Task<SkillDto> GetById(Guid id)

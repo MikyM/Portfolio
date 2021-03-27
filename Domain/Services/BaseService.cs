@@ -1,5 +1,6 @@
 ﻿using Contracts;
 using Entities;
+using Entities.Filters;
 using Microsoft.EntityFrameworkCore;
 using Repository.Repositories;
 using System;
@@ -9,7 +10,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repository.Services
+namespace Domain.Services
 {
     public class BaseService<T> : IBaseService<T> where T : BaseEntity
     {
@@ -20,9 +21,12 @@ namespace Repository.Services
             _repository = repository;
         }
 
-        public async Task<IEnumerable<T>> GetAsync()
+        public async Task<IEnumerable<T>> GetAll(PaginationFilter filter)
         {
-            return await _repository.GetAll().ToListAsync();
+            return await _repository.GetAll()
+                        .Skip((filter.PageNumber - 1) * filter.PageSize)
+                        .Take(filter.PageSize)
+                        .ToListAsync();
         }
 
         public async Task<T> GetById(Guid id)

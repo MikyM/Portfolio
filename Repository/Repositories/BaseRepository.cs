@@ -30,6 +30,10 @@ namespace Repository.Repositories
         {
             return this.RepositoryContext.Set<TEntity>().Where(expression).AsNoTracking();
         }
+        public async Task<int> CountAsync()
+        {
+            return await this.RepositoryContext.Set<TEntity>().CountAsync();
+        }
         public void Create(TEntity entity)
         {
             if (entity == null) throw new ArgumentNullException(string.Format(_errorHandler.GetMessage(ErrorMessagesEnum.EntityNull), "", "Input data is null"));

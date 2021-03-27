@@ -13,24 +13,30 @@ using Microsoft.AspNetCore.Identity;
 using Domain.Helpers;
 using System.Security.Claims;
 using AuthService.Helpers;
+using Domain.Services;
 
 namespace Domain.Controllers
 {
-    /*[ApiController]
+    [ApiController]
     [Route("api/[controller]")]
-    public class AccountsController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly ILoggerManager _logger;
-        private readonly IRepositoryWrapper _repository;
-        private readonly IMapper _mapper;
-        public AccountsController(ILoggerManager logger, IRepositoryWrapper repository, IMapper mapper)
+        private readonly IUserService _userService;
+        public UsersController(ILoggerManager logger, IUserService userService)
         {
             _logger = logger;
-            _repository = repository;
-            _mapper = mapper;
+            _userService = userService;
         }
 
-        [AllowAnonymous]
+        [HttpGet]
+        public Task<IActionResult> GetAllUsers()
+        {
+            var usersResult = _userService.Get();
+            return Task.FromResult<IActionResult>(Ok(usersResult));
+        }
+
+        /*[AllowAnonymous]
         // POST api/accounts
         [HttpPost("user/create")]
         public async Task<IActionResult> CreateUser([FromBody] AppUserForCreationDto user)
@@ -39,8 +45,8 @@ namespace Domain.Controllers
                 return BadRequest(ModelState);
             }
 
-            var userIdentity = _mapper.Map<AppUser>(user);
-            var result = await _userManager.CreateAsync(userIdentity, user.Password);
+            //var userIdentity = _mapper.Map<AppUser>(user);
+            //var result = await _userManager.CreateAsync(userIdentity, user.Password);
 
             if (!result.Succeeded) return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
 
@@ -115,6 +121,6 @@ namespace Domain.Controllers
             //await _appDbContext.SaveChangesAsync();
 
             return NoContent();
-        }
-    }*/
+        }*/
+    }
 }
